@@ -31,22 +31,22 @@
 #define     _IFSOCK 0140000 /* socket */
 #define     _IFIFO  0010000 /* fifo */
 
-struct fs_node;
+struct fsys_node;
 
-typedef uint32_t (*read_type_t) (struct fs_node *, uint32_t, uint32_t, uint8_t *);
-typedef uint32_t (*write_type_t) (struct fs_node *, uint32_t, uint32_t, uint8_t *);
-typedef void (*open_type_t) (struct fs_node *, unsigned int flags);
-typedef void (*close_type_t) (struct fs_node *);
-typedef struct dirent *(*readdir_type_t) (struct fs_node *, uint32_t);
-typedef struct fs_node *(*finddir_type_t) (struct fs_node *, char *name);
-typedef void (*create_type_t) (struct fs_node *, char *name, uint16_t permission);
-typedef void (*unlink_type_t) (struct fs_node *, char *name);
-typedef void (*mkdir_type_t) (struct fs_node *, char *name, uint16_t permission);
-typedef int (*ioctl_type_t) (struct fs_node *, int request, void * argp);
-typedef int (*get_size_type_t) (struct fs_node *);
-typedef int (*chmod_type_t) (struct fs_node *, int mode);
+typedef uint32_t (*read_type_t) (struct fsys_node *, uint32_t, uint32_t, uint8_t *);
+typedef uint32_t (*write_type_t) (struct fsys_node *, uint32_t, uint32_t, uint8_t *);
+typedef void (*open_type_t) (struct fsys_node *, unsigned int flags);
+typedef void (*close_type_t) (struct fsys_node *);
+typedef struct dirent *(*readdir_type_t) (struct fsys_node *, uint32_t);
+typedef struct fsys_node *(*finddir_type_t) (struct fsys_node *, char *name);
+typedef void (*create_type_t) (struct fsys_node *, char *name, uint16_t permission);
+typedef void (*unlink_type_t) (struct fsys_node *, char *name);
+typedef void (*mkdir_type_t) (struct fsys_node *, char *name, uint16_t permission);
+typedef int (*ioctl_type_t) (struct fsys_node *, int request, void * argp);
+typedef int (*get_size_type_t) (struct fsys_node *);
+typedef int (*chmod_type_t) (struct fsys_node *, int mode);
 
-typedef struct fs_node {
+typedef struct fsys_node {
 	char name[256];         /* The filename. */
 	void * device;          /* Device object (optional) */
 	uint32_t mask;          /* The permissions mask. */
@@ -77,10 +77,10 @@ typedef struct fs_node {
 	chmod_type_t chmod;
 	unlink_type_t unlink;
 
-	struct fs_node *ptr;   /* Alias pointer, for symlinks. */
+	struct fsys_node *ptr;   /* Alias pointer, for symlinks. */
 	uint32_t offset;       /* Offset for read operations XXX move this to new "file descriptor" entry */
 	int32_t shared_with;   /* File descriptor sharing XXX */
-} fs_node_t;
+} fsys_node_t;
 
 struct dirent {
 	uint32_t ino;           /* Inode number. */
@@ -104,37 +104,37 @@ struct stat  {
 	uint32_t  __unused3;
 };
 
-extern fs_node_t *fs_root;
-extern fs_node_t * null_device_create(void);
-extern fs_node_t * zero_device_create(void);
-extern fs_node_t * serial_device_create(int device);
-extern fs_node_t * procfs_create(void);
-extern fs_node_t * tmpfs_create(void);
+extern fsys_node_t *fsys_root;
+extern fsys_node_t * null_device_create(void);
+extern fsys_node_t * zero_device_create(void);
+extern fsys_node_t * serial_device_create(int device);
+extern fsys_node_t * procfsys_create(void);
+extern fsys_node_t * tmpfsys_create(void);
 extern void serial_mount_devices(void);
 extern int openpty(int * master, int * slave, char * name, void * _ign0, void * size);
 
-extern fs_node_t * hello_device_create(void);
-extern fs_node_t * random_device_create(void);
+extern fsys_node_t * hello_device_create(void);
+extern fsys_node_t * random_device_create(void);
 
-uint32_t read_fs(fs_node_t *node, uint32_t offset, uint32_t size, uint8_t *buffer);
-uint32_t write_fs(fs_node_t *node, uint32_t offset, uint32_t size, uint8_t *buffer);
-void open_fs(fs_node_t *node, unsigned int flags);
-void close_fs(fs_node_t *node);
-struct dirent *readdir_fs(fs_node_t *node, uint32_t index);
-fs_node_t *finddir_fs(fs_node_t *node, char *name);
+uint32_t read_fs(fsys_node_t *node, uint32_t offset, uint32_t size, uint8_t *buffer);
+uint32_t write_fs(fsys_node_t *node, uint32_t offset, uint32_t size, uint8_t *buffer);
+void open_fs(fsys_node_t *node, unsigned int flags);
+void close_fs(fsys_node_t *node);
+struct dirent *readdir_fs(fsys_node_t *node, uint32_t index);
+fsys_node_t *finddir_fs(fsys_node_t *node, char *name);
 int mkdir_fs(char *name, uint16_t permission);
 int create_file_fs(char *name, uint16_t permission);
-fs_node_t *kopen(char *filename, uint32_t flags);
+fsys_node_t *kopen(char *filename, uint32_t flags);
 char *canonicalize_path(char *cwd, char *input);
-fs_node_t *clone_fs(fs_node_t * source);
-int ioctl_fs(fs_node_t *node, int request, void * argp);
-int chmod_fs(fs_node_t *node, int mode);
+fsys_node_t *clone_fs(fsys_node_t * source);
+int ioctl_fs(fsys_node_t *node, int request, void * argp);
+int chmod_fs(fsys_node_t *node, int mode);
 int unlink_fs(char * name);
 
-void vfs_install(void);
-int vfs_mount(char * path, fs_node_t * local_root);
+void vfsys_install(void);
+int vfsys_mount(char * path, fsys_node_t * local_root);
 
 /* Debug purposes only, please */
-void debug_print_vfs_tree(void);
+void debug_print_vfsys_tree(void);
 
 #endif
