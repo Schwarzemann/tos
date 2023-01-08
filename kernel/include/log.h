@@ -3,10 +3,10 @@
 
 typedef enum {
 	INFO = 0, /* Unimportant */
-	NOTICE,   /* Important, but not bad */
-	WARNING,  /* Not what was expected, but still okay */
-	ERROR,    /* This is bad... */
-	CRITICAL, /* Shit */
+	NOTICE,   /* Important, but not so worrying */
+	WARNING,  /* Not what was expected, but still not worrying */
+	ERROR,    /* Now this is bad... */
+	CRITICAL, /* Fuck... */
 	INSANE
 } log_type_t;
 
