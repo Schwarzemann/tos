@@ -1,31 +1,37 @@
-; A very simple boot loader 
+ORG 0x7c00      ; Set the origin to 0x7c00
 
-org 0x7c00      ; Set the origin to the start of the boot sector
+mov ax, 0x0000   ; Set up the data segment
+mov ds, ax
 
-start:
-    ; Disable interrupts
-    cli
+mov si, msg      ; Display a message
+call print
 
-    ; Load data into the segment registers
-    xor ax, ax
-    mov ds, ax
-    mov es, ax
+mov ax, 0x0000   ; Load the program from the first sector of the floppy disk
+mov es, ax
+mov bx, 0x0000
+mov ah, 0x02
+mov al, 0x01
+mov ch, 0x00
+mov cl, 0x02
+mov dh, 0x00
+int 0x13
 
-    ; Load the contents of the boot sector into memory
-    mov ah, 0x02
-    mov al, 0x01
-    mov ch, 0x00
-    mov cl, 0x02
-    mov dh, 0x00
-    mov dl, 0x80     ; Load the boot sector from the first hard disk
-    mov bx, 0x0000
-    mov es, bx       ; Set the segment of the buffer to 0
-    mov bx, 0x7c00   ; Set the offset of the buffer to 7C00h
-    int 0x13         ; Call BIOS interrupt 13h to read the disk
+jmp 0x0000:0x0000 ; Jump to the start of the loaded program
 
-    ; Jump to the start of the loaded code
-    jmp 0x0000:0x7c00
+print:
+    lodsb         ; Load a byte from the message
+    or al, al     ; Check if it is null
+    jz done       ; If it is null, return
+    mov ah, 0x0e  ; Otherwise, display the character
+    mov bh, 0x00
+    mov bl, 0x07
+    int 0x10
+    jmp print     ; Repeat for the next character
 
-    ; Fill the rest of the sector with zeros
-    times 510-($-$$) db 0
-    dw 0xaa55       ; Boot signature
+done:
+    ret           ; Return to the caller
+
+msg db 'TuneOS Loading...', 0
+
+times 510-($-$$) db 0   ; Pad the boot sector to 510 bytes
+dw 0xaa55              ; Add the boot signature at the end
